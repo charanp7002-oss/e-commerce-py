@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milepost — Vehicle Rentals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F4EF;
+    --paper-dim:#EDEAE2;
+    --ink:#1C1F26;
+    --ink-soft:#3A3F49;
+    --slate:#5B6472;
+    --yellow:#F2B705;
+    --yellow-deep:#C99500;
+    --green:#1F6F54;
+    --red:#C1443C;
+    --line:#D8D4C8;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    letter-spacing:0.2px;
+    color:var(--ink);
+    margin:0;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  .container{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- Header ---------- */
+  header{
+    border-bottom:2px solid var(--ink);
+    background:var(--paper);
+    position:sticky;top:0;z-index:50;
+  }
+  .header-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;max-width:1080px;margin:0 auto;
+  }
+  .logo{
+    display:flex;align-items:baseline;gap:8px;
+  }
+  .logo .mark{
+    background:var(--ink);color:var(--yellow);
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;
+    font-size:22px;padding:2px 8px;line-height:1;
+  }
+  .logo .word{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:600;}
+  nav{display:flex;gap:2px;}
+  nav button{
+    background:none;border:none;padding:10px 16px;
+    font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;
+    color:var(--slate);border-bottom:3px solid transparent;
+  }
+  nav button.active{color:var(--ink);border-bottom-color:var(--yellow);}
+  nav button:hover{color:var(--ink);}
+
+  /* ---------- Screens ---------- */
+  .screen{display:none;animation:fadein .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  /* ---------- Hero / Search ---------- */
+  .hero{
+    padding:56px 0 40px;border-bottom:1px solid var(--line);
+  }
+  .hero h1{font-size:52px;line-height:0.98;max-width:640px;}
+  .hero p.sub{color:var(--ink-soft);max-width:480px;margin-top:14px;font-size:16px;}
+
+  .search-panel{
+    margin-top:32px;background:var(--ink);color:var(--paper);
+    padding:22px 24px;display:grid;
+    grid-template-columns:repeat(4,1fr) auto;gap:0;
+    border:2px solid var(--ink);
+  }
+  .search-field{
+    padding:0 18px;border-right:1px solid #40454F;
+  }
+  .search-field:first-child{padding-left:0;}
+  .search-panel .search-field label{
+    display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;
+    color:#9CA3AF;margin-bottom:6px;
+  }
+  .search-panel select, .search-panel input{
+    background:none;border:none;color:var(--paper);
+    font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:500;
+    width:100%;padding:0;
+  }
+  .search-panel select:focus, .search-panel input:focus{outline:none;}
+  .search-panel option{color:var(--ink);}
+  .search-btn{
+    background:var(--yellow);color:var(--ink);border:none;
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;
+    padding:0 32px;white-space:nowrap;
+  }
+  .search-btn:hover{background:var(--yellow-deep);}
+
+  /* ---------- Type filter markers ---------- */
+  .type-strip{
+    display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;
+  }
+  .marker{
+    background:var(--paper);border:2px solid var(--ink);
+    border-top:8px solid var(--yellow);
+    padding:10px 16px 8px;font-family:'Barlow Condensed',sans-serif;
+    font-weight:600;font-size:16px;color:var(--ink-soft);
+    min-width:96px;text-align:center;
+  }
+  .marker.active{background:var(--ink);color:var(--paper);border-top-color:var(--yellow);}
+  .marker:hover{cursor:pointer;border-color:var(--ink);}
+  .marker .count{display:block;font-size:12px;color:var(--slate);font-family:'IBM Plex Sans',sans-serif;margin-top:2px;font-weight:400;}
+  .marker.active .count{color:#C9CDD3;}
+
+  /* ---------- Vehicle grid / ticket cards ---------- */
+  .section-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin:44px 0 18px;
+  }
+  .section-head h2{font-size:28px;}
+  .section-head .meta{color:var(--slate);font-size:13px;}
+
+  .grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:56px;
+  }
+  .ticket{
+    background:#fff;border:1px solid var(--line);
+    display:flex;flex-direction:column;
+  }
+  .ticket-top{padding:18px 18px 14px;}
+  .ticket-top .vtype{
+    font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--slate);
+  }
+  .ticket-top h3{font-size:24px;margin-top:2px;}
+  .specs{display:flex;gap:14px;margin-top:10px;color:var(--ink-soft);font-size:13px;flex-wrap:wrap;}
+  .specs span{display:flex;align-items:center;gap:5px;}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;}
+  .dot.busy{background:var(--red);}
+
+  .perforation{
+    border-top:2px dashed var(--line);position:relative;
+  }
+  .perforation::before,.perforation::after{
+    content:'';position:absolute;top:-7px;width:14px;height:14px;border-radius:50%;
+    background:var(--paper);border:1px solid var(--line);
+  }
+  .perforation::before{left:-8px;}
+  .perforation::after{right:-8px;}
+
+  .ticket-bottom{
+    padding:14px 18px 18px;display:flex;align-items:flex-end;justify-content:space-between;
+  }
+  .price .amount{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;line-height:1;}
+  .price .unit{font-size:12px;color:var(--slate);}
+  .book-btn{
+    background:var(--ink);color:var(--paper);border:none;padding:9px 18px;
+    font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+  }
+  .book-btn:hover{background:var(--yellow);color:var(--ink);}
+
+  /* ---------- Booking screen ---------- */
+  .stepper{display:flex;gap:0;margin:36px 0 32px;border-bottom:1px solid var(--line);}
+  .step{
+    padding:0 0 14px;margin-right:36px;font-family:'Barlow Condensed',sans-serif;
+    font-size:18px;font-weight:600;color:var(--slate);border-bottom:3px solid transparent;
+    position:relative;top:1px;
+  }
+  .step.current{color:var(--ink);border-bottom-color:var(--yellow);}
+  .step.done{color:var(--green);}
+
+  .booking-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:40px;margin-bottom:60px;}
+  .field-row{margin-bottom:20px;}
+  .field-row label{display:block;font-size:13px;color:var(--slate);margin-bottom:6px;}
+  .field-row input, .field-row select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);background:#fff;
+    font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--ink);
+  }
+  .field-row input:focus, .field-row select:focus{outline:2px solid var(--yellow);outline-offset:0;border-color:var(--ink);}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+  .summary-box{
+    border:1px solid var(--ink);padding:22px;background:#fff;height:fit-content;
+  }
+  .summary-box h3{font-size:22px;margin-bottom:14px;}
+  .summary-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px solid var(--paper-dim);}
+  .summary-row.total{
+    border-bottom:none;border-top:2px solid var(--ink);margin-top:6px;padding-top:12px;
+    font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;
+  }
+  .summary-note{font-size:12px;color:var(--slate);margin-top:14px;line-height:1.5;}
+  .primary-btn{
+    width:100%;background:var(--yellow);color:var(--ink);border:none;padding:13px;
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;margin-top:18px;
+  }
+  .primary-btn:hover{background:var(--yellow-deep);}
+
+  /* ---------- Confirmation ---------- */
+  .confirm-wrap{max-width:520px;margin:60px auto;text-align:left;padding-bottom:80px;}
+  .confirm-mark{
+    width:52px;height:52px;background:var(--green);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-size:26px;margin-bottom:20px;
+  }
+  .confirm-wrap h2{font-size:34px;margin-bottom:10px;}
+  .confirm-id{
+    display:inline-block;background:var(--ink);color:var(--yellow);
+    font-family:'Barlow Condensed',sans-serif;padding:4px 10px;font-size:16px;margin:12px 0 24px;
+  }
+  .confirm-details{border:1px solid var(--line);background:#fff;padding:20px;}
+  .confirm-details .summary-row:last-child{border-bottom:none;}
+
+  /* ---------- Admin ---------- */
+  .admin-shell{display:grid;grid-template-columns:200px 1fr;gap:0;margin-top:8px;min-height:520px;border-top:1px solid var(--line);}
+  .admin-nav{border-right:1px solid var(--line);padding:24px 0;}
+  .admin-nav a{
+    display:block;padding:10px 24px;font-size:14px;color:var(--ink-soft);
+    border-left:3px solid transparent;
+  }
+  .admin-nav a.active{border-left-color:var(--yellow);color:var(--ink);font-weight:600;background:var(--paper-dim);}
+  .admin-main{padding:28px 32px;}
+  .admin-main h2{font-size:26px;margin-bottom:4px;}
+  .admin-main .sub{color:var(--slate);font-size:13px;margin-bottom:24px;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:30px;}
+  .stat{
+    border-left:4px solid var(--yellow);padding:10px 14px;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+  }
+  .stat .label{font-size:12px;color:var(--slate);}
+  .stat .value{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;margin-top:2px;}
+  .stat.alert{border-left-color:var(--red);}
+  .stat.good{border-left-color:var(--green);}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;}
+  thead th{
+    text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
+    padding:9px 12px;border-bottom:2px solid var(--ink);color:var(--ink-soft);
+  }
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--paper-dim);}
+  .badge{padding:2px 8px;font-size:11.5px;font-weight:600;display:inline-block;}
+  .badge.available{background:#E4F1EC;color:var(--green);}
+  .badge.booked{background:#FCEFD1;color:var(--yellow-deep);}
+  .badge.maint{background:#F7E4E2;color:var(--red);}
+
+  footer{border-top:2px solid var(--ink);margin-top:20px;}
+  .footer-inner{max-width:1080px;margin:0 auto;padding:24px;display:flex;justify-content:space-between;color:var(--slate);font-size:13px;}
+
+  @media (max-width:860px){
+    .grid{grid-template-columns:1fr 1fr;}
+    .search-panel{grid-template-columns:1fr 1fr;}
+    .booking-layout{grid-template-columns:1fr;}
+    .admin-shell{grid-template-columns:1fr;}
+    .stat-row{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr;}
+    .search-panel{grid-template-columns:1fr;}
+    .search-field{border-right:none;border-bottom:1px solid #40454F;padding:12px 0;}
+    .hero h1{font-size:38px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .screen{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo"><span class="mark">MP</span><span class="word">Milepost</span></div>
+    <nav>
+      <button class="nav-btn active" data-screen="search">Search</button>
+      <button class="nav-btn" data-screen="booking">Book</button>
+      <button class="nav-btn" data-screen="confirm">Confirmation</button>
+      <button class="nav-btn" data-screen="admin">Admin</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ SCREEN 1: SEARCH & LISTING ============ -->
+<section id="screen-search" class="screen active">
+  <div class="container">
+    <div class="hero">
+      <h1>Book wheels for<br>wherever the road takes you.</h1>
+      <p class="sub">Scooters to mini trucks, across five cities. Real-time availability, GST-inclusive pricing shown up front, no surprises at pickup.</p>
+
+      <div class="search-panel">
+        <div class="search-field">
+          <label>Pickup city</label>
+          <select id="f-city">
+            <option>Mumbai — Andheri</option>
+            <option>Bengaluru — Koramangala</option>
+            <option>New Delhi — Connaught Place</option>
+            <option>Pune — Hinjewadi</option>
+            <option>Kolkata — Salt Lake</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label>Pickup</label>
+          <input type="date" id="f-start" value="2026-09-05">
+        </div>
+        <div class="search-field">
+          <label>Drop-off</label>
+          <input type="date" id="f-end" value="2026-09-07">
+        </div>
+        <div class="search-field">
+          <label>Vehicle type</label>
+          <select id="f-type">
+            <option>Any type</option>
+            <option>Scooter/Bike</option>
+            <option>Hatchback Car</option>
+            <option>Sedan</option>
+            <option>SUV</option>
+            <option>Mini Truck</option>
+          </select>
+        </div>
+        <button class="search-btn" onclick="runSearch()">Search</button>
+      </div>
+
+      <div class="type-strip" id="type-strip"></div>
+    </div>
+
+    <div class="section-head">
+      <h2 id="results-heading">14 vehicles available in Mumbai — Andheri</h2>
+      <span class="meta">Prices shown include 18% GST</span>
+    </div>
+
+    <div class="grid" id="vehicle-grid"></div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 2: BOOKING ============ -->
+<section id="screen-booking" class="screen">
+  <div class="container">
+    <div class="stepper">
+      <div class="step done">1 · Vehicle</div>
+      <div class="step current">2 · Details</div>
+      <div class="step">3 · Payment</div>
+      <div class="step">4 · Confirm</div>
+    </div>
+
+    <div class="booking-layout">
+      <div>
+        <h2 style="font-size:26px;margin-bottom:18px;">Trip &amp; renter details</h2>
+
+        <div class="field-row two-col">
+          <div>
+            <label>Pickup date &amp; time</label>
+            <input type="datetime-local" value="2026-09-05T10:00">
+          </div>
+          <div>
+            <label>Drop-off date &amp; time</label>
+            <input type="datetime-local" value="2026-09-07T10:00">
+          </div>
+        </div>
+
+        <div class="field-row two-col">
+          <div>
+            <label>Pickup branch</label>
+            <select><option>Andheri Branch, Mumbai</option></select>
+          </div>
+          <div>
+            <label>Drop-off branch</label>
+            <select><option>Andheri Branch, Mumbai</option><option>Hinjewadi Branch, Pune</option></select>
+          </div>
+        </div>
+
+        <div class="field-row two-col">
+          <div>
+            <label>Full name</label>
+            <input type="text" placeholder="As on driving licence" value="Rohan Sharma">
+          </div>
+          <div>
+            <label>Phone</label>
+            <input type="tel" placeholder="10-digit mobile number" value="9876543210">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>Driving licence number</label>
+          <input type="text" placeholder="e.g. MH1420230012345">
+        </div>
+
+        <div class="field-row">
+          <label>Upload licence &amp; ID (KYC)</label>
+          <input type="file">
+        </div>
+      </div>
+
+      <div class="summary-box" id="booking-summary">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 3: CONFIRMATION ============ -->
+<section id="screen-confirm" class="screen">
+  <div class="container">
+    <div class="confirm-wrap">
+      <div class="confirm-mark">✓</div>
+      <h2>Booking confirmed.</h2>
+      <p style="color:var(--ink-soft);">A confirmation has been sent by SMS and email. Bring your driving licence and a valid ID to the branch at pickup.</p>
+      <div class="confirm-id">BOOKING #VRMS-20260905-0472</div>
+      <div class="confirm-details">
+        <div class="summary-row"><span>Vehicle</span><span>Hyundai Creta (SUV)</span></div>
+        <div class="summary-row"><span>Branch</span><span>Andheri Branch, Mumbai</span></div>
+        <div class="summary-row"><span>Pickup</span><span>05 Sep, 10:00 AM</span></div>
+        <div class="summary-row"><span>Drop-off</span><span>07 Sep, 10:00 AM</span></div>
+        <div class="summary-row"><span>Amount paid</span><span>₹6,608</span></div>
+      </div>
+      <button class="primary-btn" onclick="showScreen('search')">Back to search</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 4: ADMIN ============ -->
+<section id="screen-admin" class="screen">
+  <div class="container">
+    <div class="admin-shell">
+      <div class="admin-nav">
+        <a href="#" class="active">Fleet overview</a>
+        <a href="#">Bookings</a>
+        <a href="#">Maintenance</a>
+        <a href="#">Revenue reports</a>
+        <a href="#">GST summary</a>
+        <a href="#">Staff &amp; branches</a>
+      </div>
+      <div class="admin-main">
+        <h2>Fleet overview</h2>
+        <div class="sub">Andheri Branch, Mumbai — 1 September 2026</div>
+
+        <div class="stat-row">
+          <div class="stat good"><div class="label">Revenue, this month</div><div class="value">₹4.86L</div></div>
+          <div class="stat"><div class="label">Fleet utilisation</div><div class="value">71%</div></div>
+          <div class="stat"><div class="label">Active bookings</div><div class="value">18</div></div>
+          <div class="stat alert"><div class="label">Docs expiring &lt; 30 days</div><div class="value">3</div></div>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Vehicle</th><th>Type</th><th>Reg. no.</th><th>Daily rate</th><th>Status</th></tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <span>Milepost Rentals — frontend prototype</span>
+    <span>Built from the VRMS SRS &amp; SDD</span>
+  </div>
+</footer>
+
+<script>
+  // ---------------- Mock data (aligned with the VRMS dataset) ----------------
+  const vehicles = [
+    {name:"Honda Activa 6G", type:"Scooter/Bike", hourly:40, daily:350, deposit:500, reg:"MH12AB4417", status:"available"},
+    {name:"TVS Jupiter", type:"Scooter/Bike", hourly:40, daily:350, deposit:500, reg:"MH14CD2290", status:"available"},
+    {name:"Maruti Suzuki Swift", type:"Hatchback Car", hourly:100, daily:1200, deposit:2000, reg:"MH12XY7734", status:"available"},
+    {name:"Hyundai i20", type:"Hatchback Car", hourly:100, daily:1200, deposit:2000, reg:"MH14PQ5561", status:"booked"},
+    {name:"Honda City", type:"Sedan", hourly:150, daily:1800, deposit:3000, reg:"MH12AB9021", status:"available"},
+    {name:"Maruti Suzuki Ciaz", type:"Sedan", hourly:150, daily:1800, deposit:3000, reg:"MH13CD3345", status:"available"},
+    {name:"Hyundai Creta", type:"SUV", hourly:220, daily:2800, deposit:5000, reg:"MH12XY6689", status:"available"},
+    {name:"Mahindra XUV700", type:"SUV", hourly:220, daily:2800, deposit:5000, reg:"MH14PQ1123", status:"maint"},
+    {name:"Tata Ace", type:"Mini Truck", hourly:300, daily:3500, deposit:5000, reg:"MH12AB8890", status:"available"},
+    {name:"Ashok Leyland Dost", type:"Mini Truck", hourly:300, daily:3500, deposit:5000, reg:"MH13CD4471", status:"available"},
+  ];
+
+  const typeCounts = {};
+  vehicles.forEach(v => typeCounts[v.type] = (typeCounts[v.type]||0)+1);
+  const types = ["Any type", "Scooter/Bike", "Hatchback Car", "Sedan", "SUV", "Mini Truck"];
+
+  let activeType = "Any type";
+  let selectedVehicle = vehicles[6]; // Creta, matches confirmation screen default
+
+  function renderTypeStrip(){
+    const strip = document.getElementById('type-strip');
+    strip.innerHTML = types.map(t => {
+      const count = t === "Any type" ? vehicles.length : (typeCounts[t]||0);
+      return `<div class="marker ${t===activeType?'active':''}" onclick="setType('${t}')">${t}<span class="count">${count} listed</span></div>`;
+    }).join('');
+  }
+
+  function setType(t){
+    activeType = t;
+    document.getElementById('f-type').value = t;
+    renderTypeStrip();
+    renderGrid();
+  }
+
+  function renderGrid(){
+    const grid = document.getElementById('vehicle-grid');
+    const list = vehicles.filter(v => activeType==="Any type" || v.type===activeType);
+    document.getElementById('results-heading').textContent =
+      `${list.length} vehicle${list.length===1?'':'s'} available in ${document.getElementById('f-city').value}`;
+
+    grid.innerHTML = list.map(v => `
+      <div class="ticket">
+        <div class="ticket-top">
+          <div class="vtype">${v.type}</div>
+          <h3>${v.name}</h3>
+          <div class="specs">
+            <span><span class="dot ${v.status!=='available'?'busy':''}"></span>${v.status==='available'?'Available now':(v.status==='booked'?'Booked till 4 Sep':'Under maintenance')}</span>
+            <span>Deposit ₹${v.deposit.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+        <div class="perforation"></div>
+        <div class="ticket-bottom">
+          <div class="price">
+            <div class="amount">₹${v.daily.toLocaleString('en-IN')}</div>
+            <div class="unit">per day · ₹${v.hourly}/hr</div>
+          </div>
+          <button class="book-btn" ${v.status!=='available'?'disabled style="opacity:.4;cursor:not-allowed;"':''} onclick='selectVehicle(${JSON.stringify(v)})'>Book</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function selectVehicle(v){
+    selectedVehicle = v;
+    renderSummary();
+    showScreen('booking');
+  }
+
+  function runSearch(){
+    renderGrid();
+  }
+
+  function daysBetween(){
+    const s = new Date(document.getElementById('f-start').value);
+    const e = new Date(document.getElementById('f-end').value);
+    const diff = Math.max(1, Math.round((e-s)/(1000*60*60*24)));
+    return diff;
+  }
+
+  function renderSummary(){
+    const days = daysBetween() || 2;
+    const base = selectedVehicle.daily * days;
+    const gst = Math.round(base * 0.18);
+    const total = base + gst;
+    document.getElementById('booking-summary').innerHTML = `
+      <h3>${selectedVehicle.name}</h3>
+      <div class="summary-row"><span>${selectedVehicle.type}</span><span>${selectedVehicle.reg}</span></div>
+      <div class="summary-row"><span>Daily rate × ${days} day${days>1?'s':''}</span><span>₹${base.toLocaleString('en-IN')}</span></div>
+      <div class="summary-row"><span>GST (18%)</span><span>₹${gst.toLocaleString('en-IN')}</span></div>
+      <div class="summary-row"><span>Refundable deposit</span><span>₹${selectedVehicle.deposit.toLocaleString('en-IN')}</span></div>
+      <div class="summary-row total"><span>Payable now</span><span>₹${(total+selectedVehicle.deposit).toLocaleString('en-IN')}</span></div>
+      <div class="summary-note">Deposit is refunded within 3–5 working days of return, minus any damage or late fees assessed at check-in.</div>
+      <button class="primary-btn" onclick="showScreen('confirm')">Confirm &amp; pay</button>
+    `;
+  }
+
+  function renderAdminTable(){
+    document.getElementById('admin-table-body').innerHTML = vehicles.map(v => `
+      <tr>
+        <td>${v.name}</td>
+        <td>${v.type}</td>
+        <td>${v.reg}</td>
+        <td>₹${v.daily.toLocaleString('en-IN')}/day</td>
+        <td><span class="badge ${v.status==='available'?'available':(v.status==='booked'?'booked':'maint')}">${v.status==='available'?'Available':(v.status==='booked'?'Booked':'Maintenance')}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function showScreen(name){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-'+name).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen===name));
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => showScreen(btn.dataset.screen));
+  });
+
+  // init
+  renderTypeStrip();
+  renderGrid();
+  renderSummary();
+  renderAdminTable();
+</script>
+
+</body>
+</html>
